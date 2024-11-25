@@ -46,27 +46,31 @@ std::string parseArgs(int argc, char **argv, sl::InitParameters &param);
 int main(int argc, char **argv)
 {
 
-    Camera zed;
+    sl::Camera zed;
     // Set configuration parameters for the ZED
     InitParameters init_parameters;
     init_parameters.coordinate_units = UNIT::METER;
-    init_parameters.coordinate_system = COORDINATE_SYSTEM::RIGHT_HANDED_Y_UP;
+    init_parameters.coordinate_system = COORDINATE_SYSTEM::RIGHT_HANDED_Z_UP_X_FWD; //@TODO : it to RIGHT_HANDED_Z_UP_X_FORWARD
+    init_parameters.depth_mode = DEPTH_MODE::ULTRA; // @TODO : change it to multiple depth modes for better accurate depth estimation
+    init_parameters.camera_resolution = RESOLUTION::HD720; // @TODO: have to try other lower resolution , as pos tracking benefits from high framerate
+    // init_parameters.camera_disable_self_calib // have to investigate the behavior during self and not self
+    std::cout<<"default depth mode :"<<init_parameters.depth_mode<<std::endl;
     init_parameters.sdk_verbose = true;
     auto mask_path = parseArgs(argc, argv, init_parameters);
 
     // Open the camera
     auto returned_state = zed.open(init_parameters);
-    if (returned_state != ERROR_CODE::SUCCESS)
+    if (returned_state != ERROR_CODE::SUCCESS)// std error code for successful behaviour
     {
         print("Camera Open", returned_state, "Exit program.");
         return EXIT_FAILURE;
     }
-
+    
     // Load optional region of interest to exclude irrelevant area of the image
     if(!mask_path.empty()) {
         sl::Mat mask_roi;
         auto err = mask_roi.read(mask_path.c_str());
-        if(err == sl::ERROR_CODE::SUCCESS)
+        if(err == sl::ERROR_CODE::SUCCESS) 
             zed.setRegionOfInterest(mask_roi, {MODULE::ALL});
         else
             std::cout << "Error loading Region of Interest file: " << err << std::endl;
@@ -79,8 +83,8 @@ int main(int argc, char **argv)
 
     // Set parameters for Positional Tracking
     PositionalTrackingParameters positional_tracking_param;  
-    positional_tracking_param.enable_imu_fusion = true;
-    positional_tracking_param.mode = sl::POSITIONAL_TRACKING_MODE::GEN_1;
+    positional_tracking_param.enable_imu_fusion = false; // @TODO: have to check with or without imu fusion
+    positional_tracking_param.mode = sl::POSITIONAL_TRACKING_MODE::GEN_2; // @TODO: have to check with GEN2 and GEN1
     // positional_tracking_param.enable_area_memory = true;
     // enable Positional Tracking
     returned_state = zed.enablePositionalTracking(positional_tracking_param);
@@ -174,8 +178,10 @@ int main(int argc, char **argv)
 inline int findImageExtension(int argc, char **argv) {
     int arg_idx=-1;
     int arg_idx_search = 0;
-    if (argc > 2) arg_idx_search=2;
-    else if(argc > 1) arg_idx_search=1;
+    if (argc > 2) 
+        arg_idx_search=2;
+    else if(argc > 1) 
+     arg_idx_search=1;
 
     if(arg_idx_search > 0 && (string(argv[arg_idx_search]).find(".png") != string::npos || 
         string(argv[arg_idx_search]).find(".jpg") != string::npos))
@@ -231,7 +237,7 @@ std::string parseArgs(int argc, char **argv, sl::InitParameters &param)
             cout << "[Sample] Using Camera in resolution VGA" << endl;
         }
     }
-    
+    //@TODO: have to investigate why mask image is used for a region of interest in pos tracking  
     if (mask_arg > 0) {
         mask_path = string(argv[mask_arg]);
         cout << "[Sample] Using Region of Interest from file : " << mask_path << endl;
