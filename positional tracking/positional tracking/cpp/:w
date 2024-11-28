@@ -47,6 +47,10 @@ inline std::string setTxt(sl::float3 value) {
 
 std::string parseArgs(int argc, char **argv, sl::InitParameters &param);
 
+void handleSigterm(int signal) {
+    std::cout << "\nReceived SIGTERM (" << signal << "). Cleaning up and exiting..." << std::endl;
+    keepRunning = 0; // Set flag to stop main program loop
+}
 
 int main(int argc, char **argv)
 {
@@ -147,9 +151,20 @@ int main(int argc, char **argv)
 
     while (viewer.isAvailable())
     {
-	 std::cout<<"inside while loop"<<std::endl;
         if (zed.grab() == ERROR_CODE::SUCCESS)
         {
+		if(keepRunning==0)
+        	{
+			zed.saveAreaMap("cod28-2.area");
+			auto export_state = sl::AREA_EXPORTING_STATE::RUNNING;
+			while (export_state == sl::AREA_EXPORTING_STATE::RUNNING) {
+			    std::cout<<"saving "<<std::endl;
+			    export_state = zed.getAreaExportState();
+			    sl::sleep_ms(5);
+			}
+	    		std::cout<< "export state: "<<export_state<<std::endl; 
+			break;
+	    	}
             // Get the position of the camera in a fixed reference frame (the World Frame)
             tracking_state = zed.getPosition(camera_path, REFERENCE_FRAME::WORLD);
 
@@ -190,20 +205,9 @@ int main(int argc, char **argv)
         else
             sleep_ms(1);
     }
-    std::cout<<"outside while loop"<<std::endl;
 
 
-    	sl::ERROR_CODE err = zed.saveAreaMap("cod28-3.area");
-	
- 	std::cout<<"after save trigger"<<std::endl; 	
-	auto export_state = sl::AREA_EXPORTING_STATE::RUNNING;
-	while (export_state == sl::AREA_EXPORTING_STATE::RUNNING) {
-	    std::cout<<"saving "<<std::endl;
-	    export_state = zed.getAreaExportState();
-	    sl::sleep_ms(5);
-	}
-	std::cout<< "export state: "<<export_state<<std::endl; 
-    	zed.disablePositionalTracking();
+    zed.disablePositionalTracking();
 
     zed.close();
     return EXIT_SUCCESS;
