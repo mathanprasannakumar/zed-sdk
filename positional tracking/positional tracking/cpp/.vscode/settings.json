@@ -1,0 +1,18 @@
+{
+    "files.associations": {
+        "*.tcc": "cpp",
+        "bitset": "cpp",
+        "vector": "cpp",
+        "memory": "cpp",
+        "string_view": "cpp",
+        "functional": "cpp",
+        "random": "cpp",
+        "string": "cpp",
+        "system_error": "cpp",
+        "typeindex": "cpp",
+        "algorithm": "cpp",
+        "chrono": "cpp",
+        "map": "cpp",
+        "filesystem": "cpp"
+    }
+}

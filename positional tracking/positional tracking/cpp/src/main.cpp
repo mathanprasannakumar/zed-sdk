@@ -28,6 +28,7 @@
 
 // Sample includes
 #include "GLViewer.hpp"
+#include <fstream>
 
 // Using std namespace
 using namespace std;
@@ -58,6 +59,7 @@ int main(int argc, char **argv)
     init_parameters.sdk_verbose = true;
     auto mask_path = parseArgs(argc, argv, init_parameters);
 
+
     // Open the camera
     auto returned_state = zed.open(init_parameters);
     if (returned_state != ERROR_CODE::SUCCESS)// std error code for successful behaviour
@@ -81,10 +83,21 @@ int main(int argc, char **argv)
     // Create text for GUI
     std::string text_rotation, text_translation;
 
-    // Set parameters for Positional Tracking
+    std::string filename ="cod28-2.area";
+
     PositionalTrackingParameters positional_tracking_param;  
+
+    std::ifstream file(filename);
+
+    if(file)
+    {
+        std::cout<<"area memory exists"<<std::endl;
+        positional_tracking_param.area_file_path = "cod28-1.area";
+    }
+    // Set parameters for Positional Tracking
     positional_tracking_param.enable_imu_fusion = false; // @TODO: have to check with or without imu fusion
     positional_tracking_param.mode = sl::POSITIONAL_TRACKING_MODE::GEN_2; // @TODO: have to check with GEN2 and GEN1
+    positional_tracking_param.enable_pose_smoothing = true;
     // positional_tracking_param.enable_area_memory = true;
     // enable Positional Tracking
     returned_state = zed.enablePositionalTracking(positional_tracking_param);
@@ -109,10 +122,13 @@ int main(int argc, char **argv)
 
     if(mask_path.empty()) {
         roi_param.auto_apply_module = {sl::MODULE::DEPTH, sl::MODULE::POSITIONAL_TRACKING};
-        zed.startRegionOfInterestAutoDetection(roi_param);
+        zed.startRegionOfInterestAutoDetection(roi_param);    returned_state = zed.enablePositionalTracking(positional_tracking_param);
+    if (returned_state != ERROR_CODE::SUCCESS) {
+        print("Enabling positional tracking failed: ", returned_state);
+        zed.close();
         print("Region Of Interest auto detection is running.");
     }
-
+    float dist = zed.getCameraInformation().camera_configuration.calibration_parameters.getCameraBaseline()*0.5f;
     Pose camera_path;
     POSITIONAL_TRACKING_STATE tracking_state;
 #if IMU_ONLY
@@ -168,6 +184,14 @@ int main(int argc, char **argv)
         else
             sleep_ms(1);
     }
+
+    zed.saveAreaMap("cod28-2.area");
+    auto export_state = sl::AREA_EXPORTING_STATE::RUNNING;
+    while (export_state == sl::AREA_EXPORTING_STATE::RUNNING) {
+            export_state = zed.getAreaExportState();
+            sl::sleep_ms(5);
+    }
+    std::cout << "export state: " << export_state << std::endl; 
 
     zed.disablePositionalTracking();
 
