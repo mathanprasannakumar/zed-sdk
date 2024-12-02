@@ -97,11 +97,11 @@ int main(int argc, char **argv) {
 
     sl::InitParameters init_parameters;
     init_parameters.sdk_verbose = true;
-    init_parameters.camera_resolution= sl::RESOLUTION::AUTO;
+    init_parameters.camera_resolution= sl::RESOLUTION::HD720;
     init_parameters.depth_mode = sl::DEPTH_MODE::NONE; // no depth computation required here
-    init_parameters.async_grab_camera_recovery = true;
-    init_parameters.enable_image_validity_check = true;
-    parseArgs(argc,argv, init_parameters);
+    // init_parameters.async_grab_camera_recovery = true;
+    // init_parameters.enable_image_validity_check = true;
+    // parseArgs(argc,argv, init_parameters);
 
     // Open the camera
     auto returned_state = zed.open(init_parameters);
@@ -112,7 +112,7 @@ int main(int argc, char **argv) {
     
     cv::String win_name = "Camera Control";
     cv::namedWindow(win_name, cv::WINDOW_NORMAL);
-    cv::setMouseCallback(win_name, onMouse);
+    // cv::setMouseCallback(win_name, onMouse);
 
     // Print camera information
     auto camera_info = zed.getCameraInformation();
@@ -131,7 +131,7 @@ int main(int argc, char **argv) {
     Mat zed_image;
 
     // Initialise camera setting
-    switchCameraSettings();
+    // switchCameraSettings();
 
     // Capture new images until 'q' is pressed
     char key = ' ';
@@ -163,7 +163,7 @@ int main(int argc, char **argv) {
         
         key = cv::waitKey(10);
         // Change camera settings with keyboard
-        updateCameraSettings(key, zed);        
+        // updateCameraSettings(key, zed);        
     }
 
     // Exit

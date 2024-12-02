@@ -87,7 +87,7 @@ int main(int argc, char **argv)
     // Create text for GUI
     std::string text_rotation, text_translation;
 
-    std::string filename ="cod29-1.area";
+    std::string filename ="../area/codd2sh.area";
 
     PositionalTrackingParameters positional_tracking_param;  
 
@@ -96,7 +96,7 @@ int main(int argc, char **argv)
     if(file)
     {
         std::cout<<"area memory exists"<<std::endl;
-        positional_tracking_param.area_file_path = "cod29-1.area";
+        positional_tracking_param.area_file_path = "../area/codd2sh.area";
     }
     // Set parameters for Positional Tracking
     positional_tracking_param.enable_imu_fusion = false; // @TODO: have to check with or without imu fusion
@@ -129,7 +129,6 @@ int main(int argc, char **argv)
     //     zed.startRegionOfInterestAutoDetection(roi_param);    returned_state = zed.enablePositionalTracking(positional_tracking_param);
     // if (returned_state != ERROR_CODE::SUCCESS) {
     //     print("Enabling positional tracking failed: ", returned_state);
-    //     zed.close();
     //     print("Region Of Interest auto detection is running.");
     // }
     float dist = zed.getCameraInformation().camera_configuration.calibration_parameters.getCameraBaseline()*0.5f;
@@ -154,7 +153,12 @@ int main(int argc, char **argv)
             tracking_state = zed.getPosition(camera_path, REFERENCE_FRAME::WORLD);
 
             sl::PositionalTrackingStatus PositionalTrackingStatus = zed.getPositionalTrackingStatus();
-            
+
+            sl::Translation translation = camera_path.getTranslation(); 
+            sl::Orientation orientation = camera_path.getOrientation();
+
+            std::cout<<"Translation : "<<translation<<std::endl;
+            std::cout<<"orientation : "<<orientation<<std::endl;
 
 #if IMU_ONLY
             PositionalTrackingStatus.odometry_status = sl::ODOMETRY_STATUS::OK;
@@ -172,7 +176,10 @@ int main(int argc, char **argv)
                 text_rotation = setTxt(camera_path.getEulerAngles());
                 text_translation = setTxt(camera_path.getTranslation());
             }
-	    std::cout<<"tracking state :"<<tracking_state<<std::endl;
+	          std::cout<<"tracking state :"<<tracking_state<<std::endl;
+	          std::cout<<"odometry state :"<<PositionalTrackingStatus.odometry_status<<std::endl;
+	          std::cout<<"spatial memory state :"<<PositionalTrackingStatus.spatial_memory_status<<std::endl;
+
 
             // Update rotation, translation and tracking state values in the OpenGL window
             viewer.updateData(camera_path.pose_data, text_translation, text_rotation, PositionalTrackingStatus);
@@ -193,7 +200,7 @@ int main(int argc, char **argv)
     std::cout<<"outside while loop"<<std::endl;
 
 
-    	sl::ERROR_CODE err = zed.saveAreaMap("cod29-1.area");
+    sl::ERROR_CODE err = zed.saveAreaMap("../area/codd2sh.area");
 	
  	std::cout<<"after save trigger"<<std::endl; 	
 	auto export_state = sl::AREA_EXPORTING_STATE::RUNNING;
