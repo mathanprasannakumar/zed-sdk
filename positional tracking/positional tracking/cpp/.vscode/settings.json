@@ -13,6 +13,7 @@
         "algorithm": "cpp",
         "chrono": "cpp",
         "map": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "fstream": "cpp"
     }
 }
