@@ -87,7 +87,7 @@ int main(int argc, char **argv)
     // Create text for GUI
     std::string text_rotation, text_translation;
 
-    std::string filename ="/zed_ws/src/zed_area/area/codd3sh.area";
+    std::string filename ="/mat-orin/zed-sdk/positional tracking/positional tracking/cpp/area/cod29sh.area";
 
     PositionalTrackingParameters positional_tracking_param;  
 
@@ -96,7 +96,7 @@ int main(int argc, char **argv)
     if(file)
     {
         std::cout<<"area memory exists"<<std::endl;
-        positional_tracking_param.area_file_path = "/zed_ws/src/zed_area/area/codd3sh.area";
+        positional_tracking_param.area_file_path = "/mat-orin/zed-sdk/positional tracking/positional tracking/cpp/area/cod29sh.area";
     }
     // Set parameters for Positional Tracking
     positional_tracking_param.enable_imu_fusion = false; // @TODO: have to check with or without imu fusion
@@ -200,7 +200,7 @@ int main(int argc, char **argv)
     std::cout<<"outside while loop"<<std::endl;
 
 
-    sl::ERROR_CODE err = zed.saveAreaMap("/zed_ws/src/zed_area/area/codd3sh.area");
+    sl::ERROR_CODE err = zed.saveAreaMap("/mat-orin/zed-sdk/positional tracking/positional tracking/cpp/area/cod29sh.area");
 	
  	std::cout<<"after save trigger"<<std::endl; 	
 	auto export_state = sl::AREA_EXPORTING_STATE::RUNNING;
@@ -213,6 +213,11 @@ int main(int argc, char **argv)
     	zed.disablePositionalTracking();
 
     zed.close();
+    /* imu section */
+    sl::SensorParameters param ;
+    sl::SensorsConfiguration config;
+    sl::SensorsData sensor_data;
+
     return EXIT_SUCCESS;
 }
 

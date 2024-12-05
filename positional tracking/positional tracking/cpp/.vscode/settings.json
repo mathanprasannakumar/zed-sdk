@@ -15,5 +15,6 @@
         "map": "cpp",
         "filesystem": "cpp",
         "fstream": "cpp"
-    }
+    },
+    "ros.distro": "humble"
 }
