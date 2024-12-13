@@ -3,7 +3,7 @@ PROJECT(ZED_Spatial_Mapping)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-SET(CMAKE_BUILD_TYPE "Release")
+SET(CMAKE_BUILD_TYPE "Debug")
 
 option(LINK_SHARED_ZED "Link with the ZED SDK shared executable" ON)
 
